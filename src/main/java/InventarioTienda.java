@@ -51,11 +51,8 @@ public class InventarioTienda {
         return scanner.nextLine();
     }
 
-    public static void agregarProductos(Object[][] productos){
+    public static void agregarProductos(Object[][] productos, int id, String nombre, int cantidad){
         try {
-            int id = Integer.parseInt(leerCadena("Ingrese el ID del producto:"));
-            String nombre = leerCadena("Ingrese el nombre del producto:");
-            int cantidad = Integer.parseInt(leerCadena("Ingrese la cantidad del producto:"));
             boolean productoEncontrado = false;
             for (int i = 0; i < productos.length; i++) {
                 if (productos[i][0] != null && (int)productos[i][0] == id) {
@@ -87,10 +84,9 @@ public class InventarioTienda {
         }
     }
 
-    public static void restarProductos(Object[][] productos){
+    public static void restarProductos(Object[][] productos, int id, int cantidad){
         try {
-            int id = Integer.parseInt(leerCadena("Ingrese el ID del producto:"));
-            int cantidad = Integer.parseInt(leerCadena("Ingrese la cantidad a restar:"));
+
             boolean productoEncontrado = false;
             for (int i = 0; i < productos.length; i++) {
                 if (productos[i][0] != null && (int)productos[i][0] == id) {
@@ -114,61 +110,78 @@ public class InventarioTienda {
         }
     }
 
-    public static void consultarDisponibilidad(Object[][] productos){
+    public static int consultarDisponibilidad(Object[][] productos, int id){
         try {
-            int id = Integer.parseInt(leerCadena("Ingrese el ID del producto:"));
-            boolean productoEncontrado = false;
             for (int i = 0; i < productos.length; i++) {
                 if (productos[i][0] != null && (int)productos[i][0] == id) {
-                    System.out.println("Cantidad disponible: " + productos[i][2]);
-                    productoEncontrado = true;
-                    break;
+                    return (int)productos[i][2];
                 }
             }
-            if (!productoEncontrado) {
-                System.out.println("Producto no encontrado.");
-            }
+            System.out.println("Producto no encontrado.");
+            return -1;
         } catch (NumberFormatException e) {
             System.out.println("Entrada no válida. Debe ser un número.");
+            return -1;
         }
     }
 
-    public static void listarProductos(Object[][] productos){
+    public static String listarProductos(Object[][] productos){
+        StringBuilder output = new StringBuilder();
         boolean hayProductos = false;
 
         for (int i = 0; i < productos.length; i++) {
             if (productos[i][0] != null) {
-                System.out.println("ID: " + productos[i][0] +
-                        ", Nombre: " + productos[i][1] +
-                        ", Cantidad: " + productos[i][2]);
+                output.append("ID: ").append(productos[i][0])
+                        .append(", Nombre: ").append(productos[i][1])
+                        .append(", Cantidad: ").append(productos[i][2])
+                        .append("\n");
                 hayProductos = true;
             }
         }
 
         if (!hayProductos) {
-            System.out.println("No hay productos en el inventario.");
+            output.append("No hay productos en el inventario.");
         }
+
+        return output.toString().trim();
     }
 
-    public static void ejecutarOpcion(int opcion, Object[][] productos){
+    public static void ejecutarOpcion(int opcion, Object[][] productos) {
         switch (opcion) {
             case 1:
-                agregarProductos(productos);
+                try {
+                    int id = Integer.parseInt(leerCadena("Ingrese el ID del producto:"));
+                    String nombre = leerCadena("Ingrese el Nombre del producto:");
+                    int cantidad = Integer.parseInt(leerCadena("Ingrese la cantidad del producto:"));
+                    agregarProductos(productos, id, nombre, cantidad);
+                } catch (NumberFormatException e) {
+                    System.out.println("Entrada no válida. Debe ser un número.");
+                }
                 break;
             case 2:
-                restarProductos(productos);
+                try {
+                    int id = Integer.parseInt(leerCadena("Ingrese el ID del producto:"));
+                    int cantidad = Integer.parseInt(leerCadena("Ingrese la cantidad a restar:"));
+                    restarProductos(productos, id, cantidad);
+                } catch (NumberFormatException e) {
+                    System.out.println("Entrada no válida. Debe ser un número.");
+                }
                 break;
             case 3:
-                consultarDisponibilidad(productos);
+                int id = Integer.parseInt(leerCadena("Ingrese el ID del producto:"));
+                int disponibilidad = consultarDisponibilidad(productos, id);
+                if (disponibilidad != -1) {
+                    System.out.println("Cantidad disponible: " + disponibilidad);
+                }
                 break;
             case 4:
-                listarProductos(productos);
+                System.out.println(listarProductos(productos));
                 break;
             case 5:
                 System.out.println("Saliendo del programa...");
                 break;
             default:
-                System.out.println("Opcion Invalida.");
+                System.out.println("Opción Inválida.");
         }
     }
 }
